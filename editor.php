@@ -10,9 +10,9 @@
 		<br><br><br>
 		<form action="vloz.php" method="post" enctype="multipart/form-data">
 		  	<label for="nadpis">Nadpis</label><br>
-		  	<input type="text" id="nadpis" name="nadpis"><br><br>
+		  	<input type="text" id="nadpis" name="nadpis" required><br><br>
 		  	<label for="obsah">Text článku</label><br>
-		  	<textarea id="obsah" name="obsah" rows="20"></textarea><br><br>
+		  	<textarea id="obsah" name="obsah" rows="20" required></textarea><br><br>
 		  	<label for="autor">Autor</label><br>
 		  	<select id="autor" name="autor">
 		  		<option value="0">Anonym</option>'

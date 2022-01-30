@@ -7,67 +7,77 @@
 	echo '<a href=".">Naspäť na zoznam článkov</a><br>';
 
 	//ukladanie obrazku
-	$target_dir = "obrazky/";
-	$target_file = $target_dir . basename($_FILES["obrazok"]["name"]);
-	$uploadOk = 1;
-	$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-
-	// KOntrola, ci sa skutocne jedna o obrazok
-	if(isset($_POST["submit"])) 
+	if ($_FILES["obrazok"]["size"] > 0)
 	{
-		$check = getimagesize($_FILES["obrazok"]["tmp_name"]);
-		if($check !== false) 
+		print_r($_FILES["obrazok"]);
+		$target_dir = "obrazky/";
+		$target_file = $target_dir . basename($_FILES["obrazok"]["name"]);
+		$uploadOk = 1;
+		$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+
+		// KOntrola, ci sa skutocne jedna o obrazok
+		if(isset($_POST["submit"])) 
 		{
-			echo "Súbor je obrázok - " . $check["mime"] . ".";
+			$check = getimagesize($_FILES["obrazok"]["tmp_name"]);
+			if($check !== false) 
+			{
+				echo "Súbor je obrázok - " . $check["mime"] . ".";
+				$uploadOk = 1;
+			} 
+			else 
+			{
+				echo "Súbor nie je obrázok.";
+				$uploadOk = 0;
+			}
+		}
+
+		// Kontrola, ci subor uz existuje, a ak ano, tak mu zmenim nazov
+		if (file_exists($target_file)) 
+		{
+			$d1 = new Datetime();
+			$d1 = $d1->format('YmdHis');
+			$filenameParts = explode (".", $target_file); 
+			$target_file = $filenameParts[0] . $d1 . "." . $filenameParts[1];
 			$uploadOk = 1;
-		} 
-		else 
+		}
+
+		// Kontrola velkosti fotky
+		if ($_FILES["obrazok"]["size"] > 1000000) 
 		{
-			echo "Súbor nie je obrázok.";
+			echo "Veľkosť fotky je príliš veľká.";
 			$uploadOk = 0;
 		}
-	}
 
-	// Kontrola, ci subor uz existuje, a ak ano, tak mu zmenim nazov
-	if (file_exists($target_file)) 
-	{
-		$d1 = new Datetime();
-		$d1 = $d1->format('YmdHis');
-		$filenameParts = explode (".", $target_file); 
-		$target_file = $filenameParts[0] . $d1 . "." . $filenameParts[1];
-		$uploadOk = 1;
-	}
-
-	// Kontrola velkosti fotky
-	if ($_FILES["obrazok"]["size"] > 1000000) 
-	{
-	  	echo "Veľkosť fotky je príliš veľká.";
-	  	$uploadOk = 0;
-	}
-
-	// Kontrola typu suboru
-	if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) 
-	{
-		echo "Iba obrázky typu JPG, JPEG, PNG & GIF môžu byť použité.";
-		$uploadOk = 0;
-	}
-
-	// Kontrola hodnoty $uploadOk
-	echo "<br>";
-	if ($uploadOk == 0) 
-	{
-	  	echo "Titulná fotka nebola uložená.";
-	} 
-	else 
-	{
-  		if (move_uploaded_file($_FILES["obrazok"]["tmp_name"], $target_file)) 
+		// Kontrola typu suboru
+		if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) 
 		{
-		    echo "Titulná fotka ". htmlspecialchars( basename( $_FILES["obrazok"]["name"])). " bola uložená.";
+			echo "Iba obrázky typu JPG, JPEG, PNG & GIF môžu byť použité.";
+			$uploadOk = 0;
+		}
+
+		// Kontrola hodnoty $uploadOk
+		echo "<br>";
+		if ($uploadOk == 0) 
+		{
+			echo "Titulná fotka nebola uložená.";
 		} 
 		else 
 		{
-		    echo "Titulná fotka nebola uložená.";
+			if (move_uploaded_file($_FILES["obrazok"]["tmp_name"], $target_file)) 
+			{
+				echo "Titulná fotka ". htmlspecialchars( basename( $_FILES["obrazok"]["name"])). " bola uložená.";
+			} 
+			else 
+			{
+				echo "Titulná fotka nebola uložená.";
+			}
 		}
+		$filenameParts = explode ("/", $target_file);
+		$obrazokName = htmlspecialchars($filenameParts[1]);
+	}
+	else
+	{
+		$obrazokName = NULL;
 	}
 	echo "<br>";
 
@@ -110,8 +120,8 @@
 
 	$link = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbusername, $dbpassword);
 	$statement = $link->prepare('INSERT INTO clanky (id_autora, nadpis, obsah, timestamp, obrazok) VALUES (:id_autora, :nadpis, :obsah, CURRENT_TIMESTAMP(), :obrazok)');
-	$filenameParts = explode ("/", $target_file);
-	$obrazokName = htmlspecialchars($filenameParts[1]);
+	/*$filenameParts = explode ("/", $target_file);
+	$obrazokName = htmlspecialchars($filenameParts[1]);*/
 	$result = $statement->execute(
 	[
 	    'id_autora' => $id_autora,
