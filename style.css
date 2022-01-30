@@ -1,0 +1,13 @@
+.titulnyObrazok
+{
+	max-width: 80%;
+	max-height: 500px;
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#nadpis, #obsah, #tagy, #komentar
+{
+	width: 100%;
+}
